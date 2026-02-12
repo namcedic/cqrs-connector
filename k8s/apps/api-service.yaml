@@ -1,0 +1,72 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: api-service
+  namespace: cqrs-cdc
+spec:
+  type: NodePort
+  selector:
+    app: api-service
+  ports:
+    - name: http
+      port: 3000
+      targetPort: 3000
+      nodePort: 30080
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: api-service
+  namespace: cqrs-cdc
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: api-service
+  template:
+    metadata:
+      labels:
+        app: api-service
+    spec:
+      containers:
+        - name: api-service
+          image: cqrs-cdc/api-service:local
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 3000
+              name: http
+          envFrom:
+            - configMapRef:
+                name: cqrs-cdc-config
+            - secretRef:
+                name: cqrs-cdc-secrets
+          env:
+            - name: API_PORT
+              valueFrom:
+                configMapKeyRef:
+                  name: cqrs-cdc-config
+                  key: API_PORT
+            - name: MYSQL_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: cqrs-cdc-secrets
+                  key: MYSQL_PASSWORD
+          resources:
+            requests:
+              cpu: "100m"
+              memory: "256Mi"
+            limits:
+              cpu: "500m"
+              memory: "512Mi"
+          readinessProbe:
+            httpGet:
+              path: /users
+              port: 3000
+            initialDelaySeconds: 15
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /users
+              port: 3000
+            initialDelaySeconds: 30
+            periodSeconds: 20

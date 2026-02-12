@@ -1,0 +1,29 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: cqrs-cdc-config
+  namespace: cqrs-cdc
+data:
+  API_PORT: "3000"
+  CONSUMER_PORT: "3001"
+  MYSQL_HOST: "mysql"
+  MYSQL_PORT: "3306"
+  MYSQL_DATABASE: "app"
+  MYSQL_USER: "app"
+  KAFKA_BROKER: "kafka:9092"
+  KAFKA_USERS_TOPIC: "mysql.app.users"
+  CASSANDRA_HOST: "cassandra"
+  CASSANDRA_PORT: "9042"
+  CASSANDRA_KEYSPACE: "user_read"
+  DEBEZIUM_CONNECT_URL: "http://debezium-connect:8083"
+  DEBEZIUM_CONNECTOR_NAME: "mysql-source-connector"
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: cqrs-cdc-secrets
+  namespace: cqrs-cdc
+type: Opaque
+stringData:
+  MYSQL_ROOT_PASSWORD: "root"
+  MYSQL_PASSWORD: "app"

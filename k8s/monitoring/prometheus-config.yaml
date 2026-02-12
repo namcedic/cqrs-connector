@@ -1,0 +1,31 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: prometheus-config
+  namespace: cqrs-cdc
+data:
+  prometheus.yml: |
+    global:
+      scrape_interval: 15s
+      evaluation_interval: 15s
+
+    scrape_configs:
+      - job_name: prometheus
+        static_configs:
+          - targets: ['localhost:9090']
+
+      # App endpoints (NOTE: hiện tại NestJS chưa expose /metrics, bạn có thể mở rộng sau)
+      - job_name: api-service
+        metrics_path: /metrics
+        static_configs:
+          - targets: ['api-service:3000']
+
+      - job_name: cdc-consumer
+        metrics_path: /metrics
+        static_configs:
+          - targets: ['cdc-consumer:3001']
+
+      - job_name: debezium-connect
+        metrics_path: /metrics
+        static_configs:
+          - targets: ['debezium-connect:8083']
