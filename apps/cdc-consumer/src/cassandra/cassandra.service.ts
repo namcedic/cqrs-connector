@@ -44,4 +44,9 @@ export class CassandraService implements OnModuleInit, OnModuleDestroy {
       params.updatedAt,
     ]);
   }
+
+  async deleteUser(userId: number) {
+    const query = 'DELETE FROM user_read.users WHERE user_id = ?';
+    await this.client.execute(query, [userId]);
+  }
 }

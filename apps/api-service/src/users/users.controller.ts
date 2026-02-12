@@ -1,7 +1,10 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
+  HttpCode,
+  HttpStatus,
   Param,
   ParseIntPipe,
   Post,
@@ -12,6 +15,7 @@ import { CommandBus, QueryBus } from '@nestjs/cqrs';
 import { UserEntity } from './entities/user.entity';
 import { CreateUserCommand } from './commands/create-user.command';
 import { UpdateUserCommand } from './commands/update-user.command';
+import { DeleteUserCommand } from './commands/delete-user.command';
 import { GetUserByIdQuery } from './queries/get-user-by-id.query';
 import { GetUsersQuery } from './queries/get-users.query';
 import { CreateUserDto } from './dto/create-user.dto';
@@ -42,6 +46,12 @@ export class UsersController {
     return this.commandBus.execute(
       new UpdateUserCommand(id, updateUserDto.name, updateUserDto.email),
     );
+  }
+
+  @Delete(':id')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  async deleteUser(@Param('id', ParseIntPipe) id: number): Promise<void> {
+    await this.commandBus.execute(new DeleteUserCommand(id));
   }
 
   @Get()

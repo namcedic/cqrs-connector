@@ -71,11 +71,33 @@ export class CdcConsumerService implements OnModuleInit {
       return;
     }
 
-    this.logger.log(
-      `Handling operation: ${env.op} for user_id: ${env.after?.id || env.before?.id}`,
-    );
+    const userIdRaw = env.after?.id || env.before?.id;
+    this.logger.log(`Handling operation: ${env.op} for user_id: ${userIdRaw}`);
 
     if (env.op === 'd') {
+      const before = env.before;
+      if (!before) {
+        this.logger.warn('Envelope "before" state is missing for delete op');
+        return;
+      }
+
+      const userId = Number(before.id);
+      if (!Number.isFinite(userId)) {
+        this.logger.warn(`Invalid user id on delete: ${before.id}`);
+        return;
+      }
+
+      try {
+        await this.cassandraService.deleteUser(userId);
+        this.logger.log(
+          `Successfully deleted user_id: ${userId} from Cassandra`,
+        );
+      } catch (err) {
+        this.logger.error(
+          `Failed to delete from Cassandra: ${err instanceof Error ? err.message : String(err)}`,
+        );
+      }
+
       return;
     }
 
