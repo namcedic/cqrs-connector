@@ -1,0 +1,5 @@
+.env
+apps/api-service/dist
+apps/cdc-consumer/dist
+apps/api-service/node_modules
+apps/cdc-consumer/node_modules

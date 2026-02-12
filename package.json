@@ -1,0 +1,14 @@
+{
+  "name": "cqrs-connector-root",
+  "version": "1.0.0",
+  "private": true,
+  "workspaces": [
+    "apps/*"
+  ],
+  "scripts": {
+    "start:api": "npm run start:dev -w apps/api-service",
+    "start:consumer": "npm run start:dev -w apps/cdc-consumer",
+    "docker:up": "docker-compose up -d",
+    "docker:down": "docker-compose down"
+  }
+}
